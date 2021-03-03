@@ -86,7 +86,8 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 1)
                 {
-
+                    //TODO insert variable here and make magic happen.
+                    Console.WriteLine($"Your current account balance is: ");
                 }
                 else if (menuSelection == 2)
                 {
