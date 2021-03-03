@@ -87,7 +87,9 @@ namespace TenmoClient
                 else if (menuSelection == 1)
                 {
                     //TODO insert variable here and make magic happen.
-                    Console.WriteLine($"Your current account balance is: ");
+                    AccountService account = new AccountService();
+                    API_Account apiAccount = account.GetAccount(UserService.GetUserId());
+                    Console.WriteLine($"Your current account balance is: {apiAccount.Balance}");
                 }
                 else if (menuSelection == 2)
                 {
