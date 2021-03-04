@@ -87,7 +87,7 @@ namespace TenmoClient
                 else if (menuSelection == 1)
                 {
                     //TODO insert variable here and make magic happen.
-                    AccountService account = new AccountService();
+                    APIService account = new APIService();
                     API_Account apiAccount = account.GetAccount(UserService.GetUserId());
                     Console.WriteLine($"Your current account balance is: {apiAccount.Balance:c2}");
                 }
@@ -101,6 +101,61 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 4)
                 {
+                    APIService users = new APIService();
+                    List<API_User> userList = users.GetUsers();
+                    Console.WriteLine("-------------------------------");
+                    Console.WriteLine("User Id".PadRight(10) + "Name");
+                    Console.WriteLine("-------------------------------");
+                    foreach (API_User user in userList)
+                    {
+                        Console.WriteLine(user.UserId.ToString().PadRight(10) + user.Username);
+                       
+                    }
+                    Console.WriteLine("-------------------------------");
+                    int answer = -1;
+                    while(answer <0)
+                    {
+                        Console.Write("Enter ID of user you are sending to (0 to cancel): ");
+                        string input = Console.ReadLine();
+                        if(!int.TryParse(input, out answer))
+                        {
+                            Console.WriteLine("Invalid input. Please enter a only a number");
+                            answer = -1;
+                        }
+                        else
+                        {
+                            answer = int.Parse(input);
+                        }
+                        
+
+                    }
+                    if (answer != 0)
+                    {
+                        API_Account account = users.GetAccount(answer);
+                        int amount = -1;
+                        while (amount < 0)
+                        {
+                            Console.Write("Enter amount: ");
+                            string input = Console.ReadLine();
+                            if (!int.TryParse(input, out amount))
+                            {
+                                Console.WriteLine("Invalid input. Please enter a only a number");
+                                amount = -1;
+                            }
+                            else
+                            {
+                                amount = int.Parse(input);
+                                if (amount < 0)
+                                {
+                                    Console.WriteLine("Enter a positive amount");
+                                }
+                            }
+
+                        }
+                    }
+
+
+
 
                 }
                 else if (menuSelection == 5)
@@ -120,5 +175,6 @@ namespace TenmoClient
                 }
             }
         }
+        
     }
 }

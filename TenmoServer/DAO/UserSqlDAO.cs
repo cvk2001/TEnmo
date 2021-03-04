@@ -111,6 +111,7 @@ namespace TenmoServer.DAO
             return GetUser(username);
         }
 
+
         private User GetUserFromReader(SqlDataReader reader)
         {
             User u = new User()
