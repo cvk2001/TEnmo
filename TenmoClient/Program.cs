@@ -89,7 +89,7 @@ namespace TenmoClient
                     //TODO insert variable here and make magic happen.
                     AccountService account = new AccountService();
                     API_Account apiAccount = account.GetAccount(UserService.GetUserId());
-                    Console.WriteLine($"Your current account balance is: {apiAccount.Balance}");
+                    Console.WriteLine($"Your current account balance is: {apiAccount.Balance:c2}");
                 }
                 else if (menuSelection == 2)
                 {
