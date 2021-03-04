@@ -112,8 +112,11 @@ namespace TenmoClient
                        
                     }
                     Console.WriteLine("-------------------------------");
+
                     int answer = -1;
-                    while(answer <0)
+                    decimal amount = -1;
+                    API_Account account = new API_Account();
+                    while (answer <0)
                     {
                         Console.Write("Enter ID of user you are sending to (0 to cancel): ");
                         string input = Console.ReadLine();
@@ -124,37 +127,61 @@ namespace TenmoClient
                         }
                         else
                         {
-                            answer = int.Parse(input);
+                            if (answer != 0)
+                            {
+                                answer = int.Parse(input);
+                                try
+                                {
+                                    account = users.GetAccount(answer);
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Enter a valid account number.");
+                                    answer = -1;
+                                }
+                                if (answer == UserService.GetUserId())
+                                {
+                                    Console.WriteLine("You can't transfer with yourself.");
+                                    answer = -1;
+                                }
+                            }
                         }
-                        
-
                     }
                     if (answer != 0)
                     {
-                        API_Account account = users.GetAccount(answer);
-                        int amount = -1;
+
                         while (amount < 0)
                         {
                             Console.Write("Enter amount: ");
                             string input = Console.ReadLine();
-                            if (!int.TryParse(input, out amount))
+
+                            if (!decimal.TryParse(input, out amount))
                             {
                                 Console.WriteLine("Invalid input. Please enter a only a number");
                                 amount = -1;
                             }
                             else
                             {
-                                amount = int.Parse(input);
-                                if (amount < 0)
+                                amount = decimal.Parse(input);
+                                amount = Math.Round(amount, 2);
+                                if (amount <= 0)
                                 {
-                                    Console.WriteLine("Enter a positive amount");
+                                    Console.WriteLine("Enter an acceptable dollar amount greater than zero.");
+                                    amount = -1;
                                 }
                             }
 
                         }
+
+
+                        API_Transfer api_transfer = new API_Transfer();
+                        api_transfer.Account_From = UserService.GetUserId();
+                        api_transfer.Account_To = answer;
+                        api_transfer.Amount = amount;
+                        users.TransferSend(api_transfer);
+                        //users.updateaccountsend(id, amount)
+                        //users.updateaccountrecieve(id, amount)
                     }
-
-
 
 
                 }
