@@ -21,7 +21,7 @@ namespace TenmoClient
 
         public List<API_Transfer> GetAllTransfers()
         {
-            RestRequest request = new RestRequest(API_URL + "transfer");
+            RestRequest request = new RestRequest(API_URL + "transfer/" + UserService.GetUserId());
             IRestResponse<List<API_Transfer>> response = client.Get<List<API_Transfer>>(request);
             if (ProcessResponse(response))
             {
@@ -29,8 +29,18 @@ namespace TenmoClient
             }
             return null;
         }
+            public API_Transfer GetTransfer(int transferId)
+            {
+                RestRequest request = new RestRequest(API_URL + "transfer/" + UserService.GetUserId() + "/" + transferId);
+                IRestResponse<API_Transfer> response = client.Get<API_Transfer>(request);
+                if (ProcessResponse(response))
+                {
+                    return response.Data;
+                }
+                return null;
+            }
 
-        public API_Transfer TransferSend(API_Transfer api_transfer)
+            public API_Transfer TransferSend(API_Transfer api_transfer)
         {
             API_Account apiAccount = GetAccount(api_transfer.Account_From);
             if (apiAccount.Balance >= api_transfer.Amount)

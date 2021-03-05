@@ -26,5 +26,33 @@ namespace TenmoServer.Controllers
             Transfer returnTransfer = TransferDAO.TransferSend(transfer);
             return Created($"/transfers/{returnTransfer}", returnTransfer);
         }
+        [HttpGet("{id}")]
+        public ActionResult<List<Transfer>> GetTransfers(int id)
+        {
+
+            List<Transfer> returnList = TransferDAO.GetTransfers(id);
+            if (returnList != null)
+            {
+                return Ok(returnList);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+        }
+        [HttpGet("{id}/{transferId}")]
+        public ActionResult<Transfer> GetTransfer(int id, int transferId)
+        {
+            Transfer transfer = TransferDAO.GetTransfer(id, transferId);
+            if (transfer != null)
+            {
+                return Ok(transfer);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }
