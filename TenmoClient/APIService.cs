@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,6 +12,23 @@ namespace TenmoClient
     {
         public readonly string API_URL = "https://localhost:44315/";
         private readonly RestClient client = new RestClient();
+        
+        public APIService()
+        {
+            
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+        }
+
+        public List<API_Transfer> GetAllTransfers()
+        {
+            RestRequest request = new RestRequest(API_URL + "transfer");
+            IRestResponse<List<API_Transfer>> response = client.Get<List<API_Transfer>>(request);
+            if (ProcessResponse(response))
+            {
+                return response.Data;
+            }
+            return null;
+        }
 
         public API_Transfer TransferSend(API_Transfer api_transfer)
         {

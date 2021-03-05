@@ -51,5 +51,44 @@ namespace TenmoServer.DAO
                 throw;
             }
         }
+
+        public List<Transfer> GetTransfers(int userId)
+        {
+            List<Transfer> transfers = new List<Transfer>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string sqlText = "select transfer_id, type.transfer_type_desc, status.transfer_status_desc, " +
+                        "userfrom.username as userfrom, userfrom.user_id as userfromid, " +
+                    "userto.username as userto, userto.user_id as usertoid, amount from transfers " +
+                    "join transfer_types as type on type.transfer_type_id = transfers.transfer_type_id " +
+                    "join transfer_statuses as status on status.transfer_status_id = transfers.transfer_status_id " +
+                    "join accounts as accountFrom on transfers.account_from = accountFrom.account_id " +
+                    "join accounts as accountTo on transfers.account_to = accountTo.account_id " +
+                    "join users as userfrom on accountFrom.user_id = userfrom.user_id " +
+                    "join users as userto on accountTo.user_id = userto.user_id " +
+                    "where (userfrom.user_id = (select user_id from users where user_id = @userId) " +
+                    "or userto.user_id = (select user_id from users where user_id = @userId));";
+
+                    //TODO command addparameters and everything else
+
+
+
+
+
+
+
+
+
+                }
+            }
+            catch
+            {
+
+            }
+            return null;
+        }
     }
 }
