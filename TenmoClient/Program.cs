@@ -97,12 +97,12 @@ namespace TenmoClient
                     Console.WriteLine("--------------------------------");
                     Console.WriteLine("Id".PadRight(11) + "From/To".PadRight(15) + "Amount");
                     Console.WriteLine("--------------------------------");
-                    
+
                     APIService service = new APIService();
                     List<API_Transfer> transferList = service.GetAllTransfers();
                     foreach (API_Transfer transfer in transferList)
                     {
-                        if(UserService.GetUserName()==transfer.UserFrom)
+                        if (UserService.GetUserName() == transfer.UserFrom)
                         {
                             Console.WriteLine($"{transfer.TransferId.ToString().PadRight(10)} " +
                                 $"to: {transfer.UserTo.PadRight(10)} " +
@@ -117,7 +117,7 @@ namespace TenmoClient
                     }
                     int selection = -1;
                     API_Transfer trans = new API_Transfer();
-                    while (selection <0)
+                    while (selection < 0)
                     {
                         Console.Write("Please enter Transfer Id to view details (0 to cancel): ");
                         string input = Console.ReadLine();
@@ -149,10 +149,10 @@ namespace TenmoClient
                                 }
 
                             }
-                            
+
                         }
                     }
-                    
+
 
                 }
                 else if (menuSelection == 3)
@@ -169,18 +169,18 @@ namespace TenmoClient
                     foreach (API_User user in userList)
                     {
                         Console.WriteLine(user.UserId.ToString().PadRight(10) + user.Username);
-                       
+
                     }
                     Console.WriteLine("-------------------------------");
 
                     int answer = -1;
                     decimal amount = -1;
                     API_Account account = new API_Account();
-                    while (answer <0)
+                    while (answer < 0)
                     {
                         Console.Write("Enter ID of user you are sending to (0 to cancel): ");
                         string input = Console.ReadLine();
-                        if(!int.TryParse(input, out answer))
+                        if (!int.TryParse(input, out answer))
                         {
                             Console.WriteLine("Invalid input. Please enter a only a number");
                             answer = -1;
@@ -233,38 +233,131 @@ namespace TenmoClient
 
                         }
 
-
                         API_Transfer api_transfer = new API_Transfer();
                         api_transfer.Account_From = UserService.GetUserId();
                         api_transfer.Account_To = answer;
                         api_transfer.Amount = amount;
-                        users.TransferSend(api_transfer);
-                        
+                        api_transfer.Status = "approved";
+                        api_transfer.Type = "send";
+                        users.Transfer(api_transfer);
+
+                        API_Account accountToUpdate = new API_Account();
+                        accountToUpdate.Id = api_transfer.Account_To;
+                        accountToUpdate.UserId = api_transfer.Account_From;
+                        accountToUpdate.Balance = amount;
+                        users.UpdateBalance(accountToUpdate);
+
+                        API_Account accountFromUpdate = new API_Account();
+                        accountFromUpdate.Id = api_transfer.Account_From;
+                        accountFromUpdate.UserId = api_transfer.Account_To;
+                        accountFromUpdate.Balance = -(amount);
+                        users.UpdateBalance(accountFromUpdate);
+
                     }
 
 
                 }
                 else if (menuSelection == 5)
                 {
+                    APIService users = new APIService();
+                    List<API_User> userList = users.GetUsers();
+                    Console.WriteLine("-------------------------------");
+                    Console.WriteLine("User Id".PadRight(10) + "Name");
+                    Console.WriteLine("-------------------------------");
+                    foreach (API_User user in userList)
+                    {
+                        Console.WriteLine(user.UserId.ToString().PadRight(10) + user.Username);
 
-                }
-                else if (menuSelection == 6)
-                {
-                    Console.WriteLine("");
-                    UserService.SetLogin(new API_User()); //wipe out previous login info
-                    Run(); //return to entry point
-                }
-                else if (menuSelection ==0)
-                {
-                    Console.WriteLine("Goodbye!");
-                    Environment.Exit(0);
-                }
-                else
-                {
-                    Console.WriteLine("Please enter a valid menu selection from the list.");
+                    }
+                    Console.WriteLine("-------------------------------");
+
+                    int answer = -1;
+                    decimal amount = -1;
+                    API_Account account = new API_Account();
+                    while (answer < 0)
+                    {
+                        Console.Write("Enter ID of user you are requesting from (0 to cancel): ");
+                        string input = Console.ReadLine();
+                        if (!int.TryParse(input, out answer))
+                        {
+                            Console.WriteLine("Invalid input. Please enter a only a number");
+                            answer = -1;
+                        }
+                        else
+                        {
+                            if (answer != 0)
+                            {
+                                answer = int.Parse(input);
+                                try
+                                {
+                                    account = users.GetAccount(answer);
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Enter a valid account number.");
+                                    answer = -1;
+                                }
+                                if (answer == UserService.GetUserId())
+                                {
+                                    Console.WriteLine("You can't request from yourself.");
+                                    answer = -1;
+                                }
+                            }
+                        }
+                    }
+                    if (answer != 0)
+                    {
+
+                        while (amount < 0)
+                        {
+                            Console.Write("Enter amount: ");
+                            string input = Console.ReadLine();
+
+                            if (!decimal.TryParse(input, out amount))
+                            {
+                                Console.WriteLine("Invalid input. Please enter a only a number");
+                                amount = -1;
+                            }
+                            else
+                            {
+                                amount = decimal.Parse(input);
+                                amount = Math.Round(amount, 2);
+                                if (amount <= 0)
+                                {
+                                    Console.WriteLine("Enter an acceptable dollar amount greater than zero.");
+                                    amount = -1;
+                                }
+                            }
+
+                        }
+
+                        API_Transfer api_transfer = new API_Transfer();
+                        api_transfer.Account_From = answer;
+                        api_transfer.Account_To = UserService.GetUserId();
+                        api_transfer.Amount = amount;
+                        api_transfer.Status = "pending";
+                        api_transfer.Type = "request";
+                        users.Transfer(api_transfer);
+                    }
+                    else if (menuSelection == 6)
+                    {
+                        Console.WriteLine("");
+                        UserService.SetLogin(new API_User()); //wipe out previous login info
+                        Run(); //return to entry point
+                    }
+                    else if (menuSelection == 0)
+                    {
+                        Console.WriteLine("Goodbye!");
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter a valid menu selection from the list.");
+                    }
                 }
             }
+
         }
-        
     }
 }
+

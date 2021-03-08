@@ -33,8 +33,8 @@ namespace TenmoServerTests
         {
             // Arrange
             Transfer transfer= new Transfer();
-            transfer.TransferTypeId = 2;
-            transfer.TransferStatusId = 2;
+            transfer.Type = "send";
+            transfer.Status="approved";
             transfer.Account_From = testAcc1Id;
             transfer.Account_To = testAcc2Id;
             transfer.Amount = 5.00M;
@@ -43,7 +43,7 @@ namespace TenmoServerTests
 
             TransferSqlDAO dao = new TransferSqlDAO(connectionString);
             // Act
-            dao.TransferSend(transfer);
+            dao.CreateTransfer(transfer);
 
             int endingTransCount = GetRowCount("transfers");
 

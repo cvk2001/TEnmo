@@ -16,7 +16,7 @@ namespace TenmoServer.DAO
             connectionString = dbConnectionString;
         }
 
-        public Transfer TransferSend(Transfer transfer)
+        public Transfer CreateTransfer(Transfer transfer)
         {
             
             try
@@ -25,24 +25,15 @@ namespace TenmoServer.DAO
                 {
                     conn.Open();
                     //create new send transfer
-                    SqlCommand cmd = new SqlCommand("Insert into transfers values((select transfer_type_id from transfer_types where transfer_type_desc = 'send'),(select transfer_status_id from transfer_statuses where transfer_status_desc = 'approved'), @fromId, @toID, @amount);", conn);
+                    SqlCommand cmd = new SqlCommand("Insert into transfers values((select transfer_type_id from transfer_types where transfer_type_desc = @type),(select transfer_status_id from transfer_statuses where transfer_status_desc = @status), @fromId, @toID, @amount);", conn);
                     cmd.Parameters.AddWithValue("@fromId", transfer.Account_From);
                     cmd.Parameters.AddWithValue("@toId", transfer.Account_To);
                     cmd.Parameters.AddWithValue("@amount", transfer.Amount);
-
+                    cmd.Parameters.AddWithValue("@type", transfer.Type);
+                    cmd.Parameters.AddWithValue("@status", transfer.Status);
                     int rowsAffected = Convert.ToInt32(cmd.ExecuteNonQuery());
 
-                    //update balance sending account
-                    cmd = new SqlCommand($"update accounts set balance = (balance - @amount) where user_id = @fromId",conn);
-                    cmd.Parameters.AddWithValue("@amount", transfer.Amount);
-                    cmd.Parameters.AddWithValue("@fromId", transfer.Account_From);
-                    cmd.ExecuteNonQuery();
-               
-                    //update balance recieving account
-                    cmd = new SqlCommand($"update accounts set balance = (balance + @amount) where user_id = @toId",conn);
-                    cmd.Parameters.AddWithValue("@amount", transfer.Amount);
-                    cmd.Parameters.AddWithValue("@toId", transfer.Account_To);
-                    cmd.ExecuteNonQuery();
+                    
                 }
                 return transfer;
             }
@@ -51,6 +42,7 @@ namespace TenmoServer.DAO
                 throw;
             }
         }
+       
 
         public List<Transfer> GetTransfers(int userId)
         {

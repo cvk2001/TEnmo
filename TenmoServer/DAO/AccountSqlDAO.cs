@@ -41,6 +41,29 @@ namespace TenmoServer.DAO
             }
             return account; 
         }
+        public Account UpdateBalances(int id, Account account)
+        {
+            
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    //update balance sending account
+                    SqlCommand cmd = new SqlCommand($"update accounts set balance = (balance + @amount) where user_id = @userID;", conn);
+                    cmd.Parameters.AddWithValue("@amount", account.Balance);
+                    cmd.Parameters.AddWithValue("@userID", id);
+                    cmd.ExecuteNonQuery();
+
+                   
+                }
+            }
+            catch (SqlException)
+            {
+                throw;
+            }
+            return account;
+        }
 
 
         private Account GetAccountFromReader(SqlDataReader reader)

@@ -8,7 +8,7 @@ namespace TenmoServer.DAO
 {
     public interface ITransferDAO
     {
-        Transfer TransferSend(Transfer transfer);
+        Transfer CreateTransfer(Transfer transfer);
 
         List<Transfer> GetTransfers(int id);
 
